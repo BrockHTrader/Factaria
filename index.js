@@ -6,14 +6,15 @@ var options = {
     Message_Color: 'white',
     ItemCount_TextSize: 8,
     ItemCount_Color: 'lightblue',
-    Action_Cooldown: 1250
+    Action_Cooldown: 1250,
+    Chunk_Size = 25
 }
 
 var spriteSheet = new Image();
 spriteSheet.src = options.SpriteSheet_Path;
 
 var canvas = document.getElementById("canvas");
-var entities = [];
+var chunks = [];
 var camera = new Camera(0, 0, 2);
 var player = new Entity((canvas.width / 2) - 16, (canvas.height / 2) - 16, 32, 'transparent', 'asset', new Asset(21));
 var playerLayer2 = new Entity((canvas.width / 2) - 16, (canvas.height / 2) - 16, 32, 'transparent', 'asset', new Asset(22));
@@ -62,17 +63,19 @@ function Render() {
     drawManager.ClearCanvas();
 
     camera.UpdateDxDy();
-    entities.forEach(entity => {
-        if (entity.markForDelete) {
-            return;
-        }
+    chunks.forEach(chunk => {
+        chunk.entities.forEach(entity => {
+            if (entity.markForDelete) {
+                return;
+            }
 
-        if (entity.entityType == 'gatherable' && entity.resource.item.amount == 0) {
-            entity.markForDelete = true;
-        }
+            if (entity.entityType == 'gatherable' && entity.resource.item.amount == 0) {
+                entity.markForDelete = true;
+            }
 
-        drawManager.DrawEntity(entity);
-        entity.Move(camera.dx * -1, camera.dy)
+            drawManager.DrawEntity(entity);
+            entity.Move(camera.dx * -1, camera.dy)
+        })
     });
 
     drawManager.DrawEntity(player);
