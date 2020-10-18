@@ -49,13 +49,16 @@ window.onload = function () {
 
 function AddGround() {
     var currentChunk = FindCurrentChunk(player.x, player.y);
-
     for (let w = 0; w < canvas.width; w += 32) {
         for (let h = 0; h < canvas.height; h += 32) {
-            var randomAssetNumber = Math.floor((Math.random() * 4) + 1) + 70;
+            var randomAssetNumber = GenerateNumberInRange(76, 83);
             chunks[0].entities.push(new Entity(w, h, 32, 'transparent', 'asset', new Asset(randomAssetNumber)));
         }
     }
+}
+
+function GenerateNumberInRange(low, high) {
+    return Math.floor((Math.random() * (high - low)) + low);
 }
 
 function FindCurrentChunk(playerX, playerY) {
