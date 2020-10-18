@@ -19,8 +19,6 @@ class Inventory {
 
             this.slots = new Slot(startingX + i * this.slotWidth, canvasHeight - (this.slotHeight * (i + 1) + i * this.slotBuffer));
         }
-
-        console.log(this.slots);
     }
 
     AddItems(item) {

@@ -148,7 +148,7 @@ class Draw {
 
     DrawHUD(camera) {
         if (camera.isHUDOn) {
-            let message = "x: " + camera.x + " y: " + camera.y + " | mx: " + mouse.x + " my: " + mouse.y;
+            let message = "x: " + camera.x + " y: " + camera.y + " | mx: " + parseInt(mouse.x) + " my: " + parseInt(mouse.y);
             let x = 8;
             let y = 16;
             let color = 'white';

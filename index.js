@@ -7,7 +7,8 @@ var options = {
     ItemCount_TextSize: 8,
     ItemCount_Color: 'lightblue',
     Action_Cooldown: 1250,
-    Chunk_Size = 25
+    Chunk_Size: 25,
+    Tile_Size: 32
 }
 
 var spriteSheet = new Image();
@@ -39,24 +40,33 @@ inventory.Setup(canvas.height, canvas.width);
 window.onload = function () {
     setInterval(Render, 10);
 
+    chunks.push(new Chunk(0, 0));
+
     SetupControls();
     AddGround();
     AddResources();
 }
 
 function AddGround() {
+    var currentChunk = FindCurrentChunk(player.x, player.y);
+
     for (let w = 0; w < canvas.width; w += 32) {
         for (let h = 0; h < canvas.height; h += 32) {
             var randomAssetNumber = Math.floor((Math.random() * 4) + 1) + 70;
-            entities.push(new Entity(w, h, 32, 'transparent', 'asset', new Asset(randomAssetNumber)));
+            chunks[0].entities.push(new Entity(w, h, 32, 'transparent', 'asset', new Asset(randomAssetNumber)));
         }
     }
+}
+
+function FindCurrentChunk(playerX, playerY) {
+    let chunkWidth = options.Chunk_Size * options.Tile_Size;
+    let chunkHeight = chunkWidth; //Chunks are squares.
 }
 
 function AddResources() {
     let coalResource = CloneObject(MasterItemList[ItemMap['Coal']]);
     coalResource.amount = 10;
-    entities.push(assetUtil.Coal(64, 0, new Resource(coalResource)));
+    chunks[0].entities.push(assetUtil.Coal(64, 0, new Resource(coalResource)));
 }
 
 function Render() {
@@ -181,7 +191,7 @@ function SetupControls() {
 
     canvas.addEventListener('click', event => {
         if (mouse.y < canvas.height - 40 || (mouse.x < menu.padLeft || mouse.x > (canvas.width - menu.padLeft))) {
-            entities.push(new Entity(mouse.x, mouse.y, 8, 'orange', 'circle', undefined));
+            chunks[0].entities.push(new Entity(mouse.x, mouse.y, 8, 'orange', 'circle', undefined));
         } else {
             var slot = Math.floor((mouse.x - menu.padLeft) / menu.slotSize);
             menu.selectedSlot = slot;
@@ -201,7 +211,7 @@ function KeyDownSpacebarHandler() {
     }
 
     let foundEntity = undefined;
-    entities.forEach(entity => {
+    chunks[0].entities.forEach(entity => {
         if (entity.entityType == 'gatherable' && !entity.markForDelete) {
             let dx = entity.x - player.x;
             let dy = entity.y - player.y;
