@@ -53,4 +53,36 @@ class Camera extends Movement {
             this.dy = 0;
         }
     }
+
+    GetRotation() {
+        if (this.dUp & this.dRight) {
+            return 45;
+        }
+
+        if (this.dUp & this.dLeft) {
+            return 315;
+        }
+
+        if (this.dDown & this.dRight) {
+            return 135;
+        }
+
+        if (this.dDown & this.dLeft) {
+            return 225;
+        }
+
+        if (this.dDown) {
+            return 180;
+        }
+
+        if (this.dRight) {
+            return 90;
+        }
+
+        if (this.dLeft) {
+            return 360 - 90;
+        }
+
+
+    }
 }

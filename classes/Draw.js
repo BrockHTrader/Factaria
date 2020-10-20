@@ -5,7 +5,7 @@ class Draw {
         this.options = options;
     }
 
-    DrawSprite(x, y, spriteNumber) {
+    DrawSprite(x, y, spriteNumber, rotation) {
         let size = this.options.SpriteSheet_Size;
         let row = 0;
         let col = 0;
@@ -22,10 +22,21 @@ class Draw {
         let sx = col * size;
         let sy = row * size;
 
-        this.context.beginPath();
-        this.context.drawImage(spriteSheet, sx, sy, size, size, x, y, size, size);
-        this.context.fill();
-        this.context.closePath();
+        if (typeof (rotation) === typeof (undefined)
+            || rotation === 0) {
+            this.context.beginPath();
+            this.context.drawImage(spriteSheet, sx, sy, size, size, x, y, size, size);
+            this.context.fill();
+            this.context.closePath();
+        } else {
+            this.context.beginPath();
+            this.context.translate(x + size / 2, y + size / 2);
+            this.context.rotate(rotation * Math.PI / 180);
+            this.context.drawImage(spriteSheet, sx, sy, size, size, size / 2 - size, size / 2 - size, size, size);
+            this.context.rotate(-rotation * Math.PI / 180);
+            this.context.translate(-x - size / 2, -y - size / 2);
+            this.context.closePath();
+        }
     }
 
     DrawSquare(x, y, height, width, outlineColor, backgroundColor) {
@@ -54,7 +65,7 @@ class Draw {
         let menuWidth = canvas.width - leftBound * 2;
 
         //Draw Background
-        DrawSquare(leftBound, topBound, menuWidth, menuHeight, 'black', 'gray');
+        this.DrawSquare(leftBound, topBound, menuWidth, menuHeight, 'black', 'gray');
 
         //Draw Inventory Slots on Menu Background
         for (let c = 0; c < rows; c++) {
@@ -76,8 +87,8 @@ class Draw {
 
             if (item.slot !== -1) {
                 let x = menu.padLeft + menu.slotSize * item.slot + (menu.slotSize - this.options.SpriteSheet_Size) / 2;
-                let y = canvas.height - menu.slotSize + (menu.slotSize - this.options.SpriteSheet_Size) / 2;
-                let textY = canvas.height - this.options.ItemCount_TextSize / 2;
+                let y = this.canvas.height - menu.slotSize + (menu.slotSize - this.options.SpriteSheet_Size) / 2;
+                let textY = this.canvas.height - this.options.ItemCount_TextSize / 2;
 
                 this.DrawSprite(x, y, item.asset.assetNumber);
                 this.DrawText(item.amount, x, textY, this.options.ItemCount_Color, this.options.ItemCount_TextSize + "px Arial");
@@ -112,7 +123,7 @@ class Draw {
             return;
         }
 
-        let x = (canvas.width / 2) - (this.context.measureText(message.message).width / 2);
+        let x = (this.canvas.width / 2) - (this.context.measureText(message.message).width / 2);
         let y = 100;
 
         this.DrawText(message.message, x, y, message.color, message.size + "px Arial");
@@ -128,7 +139,7 @@ class Draw {
         }
     }
 
-    DrawEntity(entity, cameraX, cameraY) {
+    DrawEntity(entity, cameraX, cameraY, rotation) {
         this.context.beginPath();
         switch (entity.type) {
             case 'circle':
@@ -138,7 +149,10 @@ class Draw {
                 this.context.rect(entity.x, entity.y, entity.size, entity.size);
                 break;
             case 'asset':
-                this.DrawSprite(entity.x - cameraX, entity.y + cameraY, entity.asset.assetNumber);
+                if (rotation !== undefined) {
+                    console.log(rotation);
+                }
+                this.DrawSprite(entity.x - cameraX, entity.y + cameraY, entity.asset.assetNumber, rotation);
                 return;
         }
         this.context.fillStyle = entity.color;

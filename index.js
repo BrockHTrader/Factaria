@@ -7,14 +7,17 @@ var options = {
     ItemCount_TextSize: 8,
     ItemCount_Color: 'lightblue',
     Action_Cooldown: 1250,
-    Chunk_Size: 25,
+    Chunk_Size: 26,
     Tile_Size: 32
 }
+
+var canvas = document.getElementById("canvas");
+options.Chunk_Size = parseInt(canvas.width / options.Tile_Size) + 1
 
 var spriteSheet = new Image();
 spriteSheet.src = options.SpriteSheet_Path;
 
-var canvas = document.getElementById("canvas");
+
 var chunkMap = {};
 var camera = new Camera(0, 0, 2);
 var player = new Entity((canvas.width / 2) - 16, (canvas.height / 2) - 16, 32, 'transparent', 'asset', new Asset(21));
@@ -49,21 +52,31 @@ function GenerateChunk(x, y) {
     if (chunkMap[x + "," + y] !== undefined)
         return;
 
-    displayMessage = new Message("Building Chunk (" + x + "," + y + ")", options.Message_Color, options.Message_Size, 1)
+    displayMessage = new Message("Building Chunk (" + x + "," + y + ")...", options.Message_Color, options.Message_Size, 10)
 
-    camera.dUp = false;
-    camera.dDown = false;
-    camera.dRight = false;
-    camera.dLeft = false;
+    let chunk = new Chunk(x, y, GenerateNumberInRange(1, 4));
 
-    let chunk = new Chunk(x, y);
-
-    let leftBuffer = (x * options.Chunk_Size * options.Tile_Size) - (options.Tile_Size * parseInt(options.Chunk_Size / 3));
+    let leftBuffer = (x * options.Chunk_Size * options.Tile_Size) - (options.Tile_Size * parseInt(options.Chunk_Size / 3) + options.Tile_Size * 5);
     let topBuffer = (y * -1 * options.Chunk_Size * options.Tile_Size) + ((options.Tile_Size * parseInt(options.Chunk_Size / 3)) + options.Tile_Size)
 
     for (let w = 0; w < options.Chunk_Size * options.Tile_Size; w += options.Tile_Size) {
         for (let h = 0; h < options.Chunk_Size * options.Tile_Size; h += options.Tile_Size) {
-            var randomAssetNumber = GenerateNumberInRange(0, 0);
+            var randomAssetNumber = -1;
+
+            switch (chunk.biomeNumber) {
+                case 1:
+                    randomAssetNumber = GenerateNumberInRange(71, 74);
+                    break;
+                case 2:
+                    randomAssetNumber = GenerateNumberInRange(76, 83);
+                    break;
+                case 3:
+                    randomAssetNumber = GenerateNumberInRange(84, 91);
+                    break;
+                case 4:
+                    randomAssetNumber = GenerateNumberInRange(0, 0);
+                    break;
+            }
 
             chunk.entities.push(new Entity(w + leftBuffer, h + topBuffer, options.Tile_Size, 'transparent', 'asset', new Asset(randomAssetNumber)));
         }
@@ -77,7 +90,7 @@ function AddGround() {
 }
 
 function GenerateNumberInRange(low, high) {
-    return Math.floor(Math.random() * (high - low + 1)) + low + 1;
+    return Math.floor(Math.random() * (high - low + 1)) + low;
 }
 
 function FindCurrentChunk(px, py) {
@@ -128,19 +141,18 @@ function Render() {
 
 
                 drawManager.DrawEntity(entity, camera.x, camera.y);
-                //entity.Move(camera.dx * -1, camera.dy)
             })
         }
     }
 
-    drawManager.DrawEntity(player, 0, 0);
-    drawManager.DrawEntity(playerLayer2, 0, 0);
+    drawManager.DrawEntity(player, 0, 0, camera.GetRotation());
+    drawManager.DrawEntity(playerLayer2, 0, 0, camera.GetRotation());
     drawManager.DrawMenu(menu);
-    drawManager.DrawInventory(inventory, menu);
     drawManager.DrawHUD(camera);
 
-    if (displayInventoryMenu)
-        drawManager.DrawInventoryMenu();
+    if (displayInventoryMenu) {
+        drawManager.DrawInventoryMenu(inventory, menu);
+    }
 
     drawManager.DrawMessage(displayMessage);
 }
