@@ -1,4 +1,4 @@
-class Movement extends Position {
+class Movement extends GridPosition {
     constructor(x, y, dx, dy) {
         super(x, y);
         this.dx = dx;

@@ -128,7 +128,7 @@ class Draw {
         }
     }
 
-    DrawEntity(entity) {
+    DrawEntity(entity, cameraX, cameraY) {
         this.context.beginPath();
         switch (entity.type) {
             case 'circle':
@@ -138,7 +138,7 @@ class Draw {
                 this.context.rect(entity.x, entity.y, entity.size, entity.size);
                 break;
             case 'asset':
-                this.DrawSprite(entity.x, entity.y, entity.asset.assetNumber);
+                this.DrawSprite(entity.x - cameraX, entity.y + cameraY, entity.asset.assetNumber);
                 return;
         }
         this.context.fillStyle = entity.color;

@@ -1,4 +1,4 @@
-class Slot extends Position {
+class Slot extends GridPosition {
     constructor(x, y) {
         super(x, y);
     }
